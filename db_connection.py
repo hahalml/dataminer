@@ -26,24 +26,35 @@ class Database:
                 print(err)
 
 
-    def insert(self, table, *data):
+    def insert(self, table, data):
         # table <string>
-        # data <list> or <tuple>
+        # data <dict> {"market" : "BTC-LTC", "price": 0.00031567}
 
         # Try to get table structure. If fail create new table with same structure as our data, local timestamp, and id
 
+        try:
+            sql = """SELECT * FROM {0}""".format(table)
+            self.cursor.execute(sql)
+            desc = self.cursor.description
 
+            for item in desc:
+                print(item[0])
+        except mysql.connector.errorcode as err:
+            print("ERROR: {}".format(err))
+
+        """
         query = ("INSERT INTO ethbtc_OHLC2 "
                                  "(time, open, high, low, close, vwap, volume, count)"
                                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
 
         try:
-            self.cursor.execute(query, *data)
+            self.cursor.execute(query, data)
             # Commit data to database
             self.cnx.commit()
             print("Success!")
         except mysql.connector.Error as err:
             print("%s--> Insert was not executed" % (err))
+        """
 
     def get_last_timestamp(self):
         """
@@ -64,3 +75,8 @@ class Database:
         self.cursor.close()
         self.cnx.close()
         print("Connection closed")
+
+if __name__ == "__main__":
+    db = Database()
+    db.insert("cacat", 1)
+    #print(row)

@@ -99,7 +99,7 @@ except mysql.connector.Error as err:
     else:
         print(err)
         exit(1)
-
+"""
 for name, ddl in TABLES.items():
     try:
         print("Creating table {}: ".format(name), end='')
@@ -111,6 +111,11 @@ for name, ddl in TABLES.items():
             print(err.msg)
     else:
         print("OK")
+"""
+cursor.execute("SELECT * FROM employees")
+desc = cursor.description
 
-cursor.close()
+
 cnx.close()
+for item in desc:
+    print(item[0])

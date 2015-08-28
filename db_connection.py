@@ -30,15 +30,21 @@ class Database:
         # table <string>
         # data <dict> {"market" : "BTC-LTC", "price": 0.00031567}
 
-        # Try to get table structure. If fail create new table with same structure as our data, local timestamp, and id
+        # Try to get table structure. If fail create new table with appropiate structure for our data,
+        # starting with id and local timestamp
 
         try:
-            sql = """SELECT * FROM {0}""".format(table)
-            self.cursor.execute(sql)
+            self.cursor.execute("""SELECT * FROM {0} LIMIT 1""".format(table))
             desc = self.cursor.description
-
+            t = ()
             for item in desc:
-                print(item[0])
+                t += (item[0],)
+            print("data = ", data)
+            print("data.keys = ", tuple(data.keys()))
+            print("data.values = ", tuple(data.values()))
+            sql = """INSERT INTO {0} """
+            #self.cursor.execute()
+
         except mysql.connector.errorcode as err:
             print("ERROR: {}".format(err))
 
@@ -78,5 +84,5 @@ class Database:
 
 if __name__ == "__main__":
     db = Database()
-    db.insert("cacat", 1)
+    db.insert("ethbtc_OHLC2", {"market" : "BTC-LTC", "price": 0.00031567})
     #print(row)

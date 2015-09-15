@@ -42,9 +42,11 @@ class Database:
             print("data = ", data)
             print("data.keys = ", tuple(data.keys()))
             print("data.values = ", tuple(data.values()))
-            sql = """INSERT INTO {0} """
-            #self.cursor.execute()
-
+            # sql = """INSERT INTO {0} {1} VALUES {2}""".format(table, tuple(data.keys()), tuple(data.values()))
+            sql = """INSERT INTO {0} {1} VALUES {2}""".format(table, tuple(data.keys()), tuple(data.values()))
+            print (sql)
+            self.cursor.execute(sql, data)
+            self.cursor.commit()
         except mysql.connector.errorcode as err:
             print("ERROR: {}".format(err))
 
@@ -83,6 +85,25 @@ class Database:
         print("Connection closed")
 
 if __name__ == "__main__":
-    db = Database()
-    db.insert("ethbtc_OHLC2", {"market" : "BTC-LTC", "price": 0.00031567})
+    db = Database(host='localhost', user='root', password='7SwwJ3y8', database='dataminer')
+    #db.insert("ethbtc_OHLC2", {"market" : "BTC-LTC", "price": 0.00031567})
+    rezolutii = [
+        {"name" : "1", "description" : "data is collected at 1 minutes interval"},
+        {"name" : "5", "description" : "data is collected at 5 minutes interval"},
+        {"name" : "15", "description" : "data is collected at 15 minutes interval"},
+        {"name" : "30", "description" : "data is collected at 30 minutes interval"},
+        {"name" : "1h", "description" : "data is collected at 1 hours interval"},
+        {"name" : "2h", "description" : "data is collected at 2 hours interval"},
+        {"name" : "3h", "description" : "data is collected at 3 hours interval"},
+        {"name" : "4h", "description" : "data is collected at 4 hours interval"},
+        {"name" : "6h", "description" : "data is collected at 6 hours interval"},
+        {"name" : "1d", "description" : "data is collected at 1 days interval"},
+        {"name" : "1w", "description" : "data is collected at 1 week interval"},
+        {"name" : "1m", "description" : "data is collected at 1 month interval"},
+        {"name" : "1y", "description" : "data is collected at 1 year interval"}
+    ]
+    for each in rezolutii:
+        db.insert("data_rezolution", each)
+        print("done {}".format(each))
+
     #print(row)

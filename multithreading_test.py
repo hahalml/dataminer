@@ -6,12 +6,12 @@ from threading import Thread
 # Dummy workers
 def polo_worker():
     while True:
-        time.sleep(3)
+        time.sleep(2)
         print("polo is mining")
 
 def kraken_worker():
     while True:
-        time.sleep(1)
+        time.sleep(2)
         print("kraken is mining")
 
 def cryptsy_worker():

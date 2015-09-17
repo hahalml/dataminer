@@ -84,6 +84,18 @@ class Manager:
             print(err)
             return False
 
+    def edit_data_by_id(self, table, columns, values, mark):
+        # table >> string
+        # columns >> tuple containing the columns to update
+        # mark >> a tuple (column_name, value) by which to search in the table
+        # values >> data to insert into columns
+        # self.cursor.execute ("UPDATE tblTableName SET Year=%s, Month=%s, Day=%s, Hour=%s, Minute=%sWHERE Server=%s", (Year, Month, Day, Hour, Minute, ServerID))
+        sql = "UPDATE {} SET {} WHERE {}={}".format(table, '=%,'.join(columns)+"=%", mark[0], mark[1])
+        try:
+            self.cursor.execute(sql, values)
+        except:
+            print("error updating")
+
     def __del__(self):
         self.connection.close()
         print("\nConnection closed")
@@ -95,7 +107,10 @@ if __name__ == "__main__":
     test_data = [("val1_col1", "val1_col2"),
                  ["val2_col1", "val2_col2"],
                  ("val3_col1", "val3_col2")]
+    columns = ("col1", "col2", "col3")
+    values = ("val1", "val2", "val3")
     #manager.add_data(table="test_table", data=test_data)
-    manager.delete_data_by_id(table=test_table, id=1)
+    #manager.delete_data_by_id(table=test_table, id=1)
+    manager.edit_data_by_id(table=test_table, mark=("cacat","pisat"), columns=columns, values=values)
     manager.get_table_content("test_table")
     #manager.get_data_by_id(table=test_table, id=2)

@@ -49,9 +49,9 @@ class Manager:
         # print data in a nice table
         print(beautiful_table)
 
-    def get_data_by_id(self, table, id):
+    def get_data(self, table, by_value, select_column="*", by_column="id"):
         try:
-            self.cursor.execute("SELECT * FROM {} WHERE id={}".format(table, id))
+            self.cursor.execute("SELECT {} FROM {} WHERE {}=%s".format(select_column, table, by_column), (by_value,))
             row = self.cursor.fetchall()
             return row
         except mysql.connector.errorcode as err:
@@ -75,24 +75,26 @@ class Manager:
         # commit data to database
         self.connection.commit()
 
-    def delete_data_by_id(self, table, id):
+    def delete_data(self, table, by_value, by_column="id"):
         try:
-            self.cursor.execute("DELETE FROM {} WHERE id={}".format(table, id))
-            print("\nDELETED id = {} FROM TABLE {}".format(id, table))
+            self.cursor.execute("DELETE FROM {} WHERE {}=%s".format(table, by_column), (by_value,))
+            self.connection.commit()
+            #print("\nDELETED {} = {} FROM TABLE {}".format(by_column, by_value, table))
             return True
         except mysql.connector.errorcode as err:
             print(err)
             return False
 
-    def edit_data_by_id(self, table, columns, values, mark):
+    def edit_data(self, table, columns, values, by_column="id"):
         # table >> string
         # columns >> tuple containing the columns to update
-        # mark >> a tuple (column_name, value) by which to search in the table
-        # values >> data to insert into columns
-        # self.cursor.execute ("UPDATE tblTableName SET Year=%s, Month=%s, Day=%s, Hour=%s, Minute=%sWHERE Server=%s", (Year, Month, Day, Hour, Minute, ServerID))
-        sql = "UPDATE {} SET {} WHERE {}={}".format(table, '=%,'.join(columns)+"=%", mark[0], mark[1])
+        # by_column >> column_name by which to search in the table
+        # values >> tuple containing data to insert into columns, last item is value for by_column
+        sql = "UPDATE {} SET {} WHERE {}={}".format(table, '=%s, '.join(columns)+"=%s ", by_column, "%s")
         try:
             self.cursor.execute(sql, values)
+            self.connection.commit()
+            print("update complete")
         except:
             print("error updating")
 
@@ -102,15 +104,15 @@ class Manager:
 
 if __name__ == "__main__":
     manager = Manager()
-    manager.get_tables()
     test_table = "test_table"
     test_data = [("val1_col1", "val1_col2"),
                  ["val2_col1", "val2_col2"],
                  ("val3_col1", "val3_col2")]
-    columns = ("col1", "col2", "col3")
-    values = ("val1", "val2", "val3")
+    columns = ("name", "description")
+    values = ("updated_name", "updated_value", "val3_col1")
+    manager.get_tables()
     #manager.add_data(table="test_table", data=test_data)
-    #manager.delete_data_by_id(table=test_table, id=1)
-    manager.edit_data_by_id(table=test_table, mark=("cacat","pisat"), columns=columns, values=values)
-    manager.get_table_content("test_table")
-    #manager.get_data_by_id(table=test_table, id=2)
+    #manager.delete_data(table=test_table, by_value="updated_name", by_column="name")
+    #manager.edit_data(table=test_table, by="name", columns=columns, values=values)
+    #manager.get_table_content("test_table")
+    #print(manager.get_data(table=test_table, select_column="id", by_value="val1_col1", by_column="name"))

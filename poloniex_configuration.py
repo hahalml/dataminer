@@ -1,4 +1,5 @@
 __author__ = 'force'
+import manager
 config = {
     "market" : {"short_name" : "poloniex",
                 "name" : "poloniex",
@@ -32,3 +33,5 @@ config = {
                 }
                 ]
 }
+x = manager.Manager()
+x.get_tables()

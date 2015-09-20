@@ -1,39 +1,32 @@
 from datetime import datetime
-from random import randint
-import random
-import pandas
 from pandas import date_range, Series
-
-data = [[1, "2015-08-27 11:27:23", 91, 2],
-        [2, "2015-08-27 11:27:33", 82, 5],
-        [3, "2015-08-27 11:27:43", 96, 2],
-        [4, "2015-08-27 11:27:53", 92, 1],
-        [5, "2015-08-27 11:28:23", 79, 1],
-        [6, "2015-08-27 11:28:33", 86, 10],
-        [7, "2015-08-27 11:28:43", 78, 4],
-        [8, "2015-08-27 11:28:53", 94, 3],
-        [9, "2015-08-27 11:29:23", 97, 7],
-        [10, "2015-08-27 11:29:33", 85, 8],
-        [11, "2015-08-27 11:29:43", 90, 9],
-        [12, "2015-08-27 11:29:53", 99, 8],
-        [13, "2015-08-27 11:30:23", 89, 2],
-        [14, "2015-08-27 11:30:33", 84, 5],
-        [15, "2015-08-27 11:30:43", 76, 6],
-        [16, "2015-08-27 11:31:13", 75, 7],
-        [17, "2015-08-27 11:31:23", 87, 2],
-        [18, "2015-08-27 11:31:33", 88, 1],
-        [19, "2015-08-27 11:31:43", 81, 3],
-        [20, "2015-08-27 11:31:53", 95, 10],
-        [21, "2015-08-27 11:31:53", 77, 5],
-        [22, "2015-08-27 11:32:13", 98, 6],
-        [23, "2015-08-27 11:32:23", 80, 4],
-        [24, "2015-08-27 11:32:33", 83, 6],
-        [25, "2015-08-27 11:32:43", 71, 5],
-        [26, "2015-08-27 11:32:53", 98, 3]]
-x = datetime.strptime("2015-08-27 11:29:00", "%Y-%m-%d %H:%M:%S")
-#print("Example date: {}".format(x))
-timestamp = x.timestamp()
-print(timestamp, "mod:", timestamp % 5)
+import re
+data = [[1, "2015-08-27 17:53:20", 91, 2],
+        [2, "2015-08-27 17:59:11", 82, 5],
+        [3, "2015-08-27 18:00:00", 96, 2],
+        [4, "2015-08-27 18:00:11", 92, 1],
+        [5, "2015-08-27 18:01:23", 79, 1],
+        [6, "2015-08-27 18:01:40", 86, 10],
+        [7, "2015-08-27 18:02:20", 78, 4],
+        [8, "2015-08-27 18:03:59", 94, 3],
+        [9, "2015-08-27 18:04:00", 97, 7],
+        [10, "2015-08-27 18:04:17", 85, 8],
+        [11, "2015-08-27 18:04:32", 90, 9],
+        [12, "2015-08-27 18:05:02", 99, 8],
+        [13, "2015-08-27 18:05:27", 89, 2],
+        [14, "2015-08-27 18:05:49", 84, 5],
+        [15, "2015-08-27 18:05:55", 76, 6],
+        [16, "2015-08-27 18:06:30", 75, 7],
+        [17, "2015-08-27 18:06:42", 87, 2],
+        [18, "2015-08-27 18:07:51", 88, 1],
+        [19, "2015-08-27 18:07:55", 81, 3],
+        [20, "2015-08-27 18:09:20", 95, 10],
+        [21, "2015-08-27 18:11:33", 77, 5],
+        [22, "2015-08-27 19:15:10", 98, 6],
+        [23, "2015-08-27 23:59:23", 80, 4],
+        [24, "2015-08-28 01:32:33", 83, 6],
+        [25, "2015-08-29 11:12:43", 71, 5],
+        [26, "2015-08-29 11:26:53", 98, 3]]
 
 def get_1_min(data):
     price = [data[0][2]]
@@ -74,7 +67,51 @@ def resample_shit(data):
     #print(ts)
     print(ts.resample('15Min', how='sum'))
 
+def get_timeframe(timeframe="1m"):
+    # 's', 'm', 'h', 'W', 'M', 'Y' stands for: seconds, minutes, hours, weeks, months, years
+    # timeframe is a string of the form: <nr_periods><period>
+    # example: '5s', '15m', '4h', '1W' etc
+    # ! nr_periods must be an int number not a float, and period is a single letter, case matters
+    # ! one month is 30 days, one year is 365 days
+
+    number = re.findall(r'^\d+', timeframe)
+    letter = re.findall(r'[smhdWMY]{1}', timeframe)
+    # tf = re.match(r'^\d+([smhdWMY]){1}', timeframe)
+    if len(number) == 1:
+        nr_periods = int(number[0])
+    else:
+        print("Error: timeframe must contain exactly 1 single or multiple digits number")
+    if len(letter) == 1:
+        period = letter[0]
+    else:
+        print("Error: timeframe must contain exactly one letter in ['s','m','h','d', 'W','M','Y']")
+
+    def nr_seconds(x):
+        return {
+            's' : 1,
+            'm' : 60,
+            'h' : 3600,
+            'd' : 86400,
+            'W' : 604800,
+            'M' : 2592000,
+            'Y' : 31536000,
+
+        }.get(x, "Error")    # 9 is default if x not found
+    tf = nr_periods * nr_seconds(period)
+    return tf
+
+def get_next_stop(timestamp, timeframe):
+    print("timestamp = {}, timeframe = {}".format(timestamp, timeframe))
+    stop = [datetime.fromtimestamp(i) for i in range(timestamp, timestamp + 3 * timeframe) if i % timeframe == 0]
+    print(stop)
+    print(min(stop))
+    # print(stop, datetime.fromtimestamp(min(stop)))
+
 
 if __name__ == "__main__":
-    #get_1_min(data)
-    resample_shit(data)
+    # get_1_min(data)
+    # resample_shit(data)
+    x = datetime.strptime("2015-08-27 18:58:32", "%Y-%m-%d %H:%M:%S")
+    timestamp = int(x.timestamp())
+    timeframe = get_timeframe("1W")
+    get_next_stop(timestamp, timeframe)

@@ -1,9 +1,14 @@
 from datetime import datetime
 from pandas import date_range, Series
+import numpy as np
 import re
-data = [[1, "2015-08-27 17:53:20", 91, 2],
+# Test data.
+# Comments are expected result for 5m timeframe
+select = [[1, "2015-08-27 17:53:20", 91, 2],
+        # 17:55
         [2, "2015-08-27 17:59:11", 82, 5],
         [3, "2015-08-27 18:00:00", 96, 2],
+        # 18:00
         [4, "2015-08-27 18:00:11", 92, 1],
         [5, "2015-08-27 18:01:23", 79, 1],
         [6, "2015-08-27 18:01:40", 86, 10],
@@ -12,6 +17,7 @@ data = [[1, "2015-08-27 17:53:20", 91, 2],
         [9, "2015-08-27 18:04:00", 97, 7],
         [10, "2015-08-27 18:04:17", 85, 8],
         [11, "2015-08-27 18:04:32", 90, 9],
+        # 18:05
         [12, "2015-08-27 18:05:02", 99, 8],
         [13, "2015-08-27 18:05:27", 89, 2],
         [14, "2015-08-27 18:05:49", 84, 5],
@@ -21,53 +27,22 @@ data = [[1, "2015-08-27 17:53:20", 91, 2],
         [18, "2015-08-27 18:07:51", 88, 1],
         [19, "2015-08-27 18:07:55", 81, 3],
         [20, "2015-08-27 18:09:20", 95, 10],
+        # 18:10
         [21, "2015-08-27 18:11:33", 77, 5],
+        # 18:15
         [22, "2015-08-27 19:15:10", 98, 6],
+        # 19:20
         [23, "2015-08-27 23:59:23", 80, 4],
+        # 2015-08-28 00:00
         [24, "2015-08-28 01:32:33", 83, 6],
+        # 01:35
         [25, "2015-08-29 11:12:43", 71, 5],
+        # 11:15
         [26, "2015-08-29 11:26:53", 98, 3]]
-
-def get_1_min(data):
-    price = [data[0][2]]
-    vol = data[0][3]
-    current_minute = (datetime.strptime(data[0][1], "%Y-%m-%d %H:%M:%S")).minute
-    # print("First minute = {}".format(current_minute))
-    # current_minute = date.minute
-
-    for i in range(1, len(data)):
-        row = data[i]
-        date_and_time = datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S")
-        new_minute = date_and_time.minute
-        new_volume = row[3]
-        if new_minute > current_minute:
-            o = price[0]
-            h = max(price)
-            l = min(price)
-            c = price[-1]
-            #print("price", price)
-            print(o, h, l, c, vol)
-            price = [row[2]]
-            vol = new_volume
-            current_minute = new_minute
-        else:
-            price.append(row[2])
-            vol = vol + new_volume
-    o = price[0]
-    h = max(price)
-    l = min(price)
-    c = price[-1]
-    #print("price", price)
-    print(o, h, l, c, vol)
-
-def resample_shit(data):
-    print("Starting")
-    rng = date_range('1/1/2012', periods=100, freq='T')
-    ts = Series(1, index=rng)
-    #print(ts)
-    print(ts.resample('15Min', how='sum'))
+        # 11:30
 
 def get_timeframe(timeframe="1m"):
+    # Timeframe:
     # 's', 'm', 'h', 'W', 'M', 'Y' stands for: seconds, minutes, hours, weeks, months, years
     # timeframe is a string of the form: <nr_periods><period>
     # example: '5s', '15m', '4h', '1W' etc
@@ -101,17 +76,62 @@ def get_timeframe(timeframe="1m"):
     return tf
 
 def get_next_stop(timestamp, timeframe):
-    print("timestamp = {}, timeframe = {}".format(timestamp, timeframe))
-    stop = [datetime.fromtimestamp(i) for i in range(timestamp, timestamp + 3 * timeframe) if i % timeframe == 0]
-    print(stop)
-    print(min(stop))
+    # print("timestamp = {} {}, timeframe = {}".format(timestamp, datetime.fromtimestamp(timestamp), timeframe))
+    stop = [datetime.fromtimestamp(i) for i in range(timestamp, timestamp + timeframe) if i % timeframe == 0]
+    # print(int((min(stop)).timestamp()))
+    return int((min(stop)).timestamp())
     # print(stop, datetime.fromtimestamp(min(stop)))
+
+def resample_data(data, tf):
+    # TODO improve validation end error handling Ex: 5m is correct but 5mm is not correct
+    # TODO buggy on any timeframe where 60 % timeframe != 0 Ex: 7m, 45m
+    # TODO also buggy on any timeframe larger than hours: d, W, M, Y
+    # Note 1: this works well for seconds, 5m, 10m, 15m, 20m, 30m, 60m / 1h - 45m works but is not perfect
+    # Note 2: until bugs are fixed use panda for data resampling
+    # Note 3: use this for one way data compression
+    # tf is a timeframe like '1m', '5m', '2h', '1d' etc
+    # data is a list of lists or tuples
+    # a data point is like this: [id, datetime, price, volume]
+    current_date = datetime.strptime(data[0][1], "%Y-%m-%d %H:%M:%S")
+    current_timestamp = int(current_date.timestamp())
+    price = [data[0][2]]
+    vol = data[0][3]
+    timeframe = get_timeframe(tf)
+    next_stop = get_next_stop(current_timestamp, timeframe)
+
+    for i in range(1, len(data)):
+        row = data[i]
+        new_date = datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S")
+        new_timestamp = new_date.timestamp()
+        new_price = row[2]
+        new_vol = row[3]
+        if new_timestamp <= next_stop:
+            price.append(new_price)
+            vol += new_vol
+        else:
+            open_price = price[0]
+            high_price = max(price)
+            low_price = min(price)
+            close_price = price[-1]
+            print("Date:{}, O:{}, H:{}, L:{}, C:{}, V:{}".format(datetime.fromtimestamp(next_stop),
+                                                                 open_price, high_price, low_price, close_price, vol))
+            next_stop = get_next_stop(int(new_timestamp), timeframe)
+            price = [new_price]
+            vol = new_vol
+    # last item
+    open_price = price[0]
+    high_price = max(price)
+    low_price = min(price)
+    close_price = price[-1]
+    print("Date:{}, O:{}, H:{}, L:{}, C:{}, V:{}".format(datetime.fromtimestamp(next_stop),
+                                                         open_price, high_price, low_price, close_price, vol))
 
 
 if __name__ == "__main__":
     # get_1_min(data)
-    # resample_shit(data)
-    x = datetime.strptime("2015-08-27 18:58:32", "%Y-%m-%d %H:%M:%S")
-    timestamp = int(x.timestamp())
-    timeframe = get_timeframe("1W")
-    get_next_stop(timestamp, timeframe)
+    # x = datetime.strptime("2015-08-27 17:53:20", "%Y-%m-%d %H:%M:%S")
+    # timestamp = int(x.timestamp())
+    # timeframe = get_timeframe("5m")
+    # get_next_stop(timestamp, timeframe)
+    # resample_data(data, '5m')
+    pass

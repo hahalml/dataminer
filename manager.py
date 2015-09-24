@@ -48,6 +48,7 @@ class Manager:
             beautiful_table.add_row(each)
         # print data in a nice table
         print(beautiful_table)
+        return rows
 
     def get_data(self, table, by_value, select_column="*", by_column="id"):
         try:

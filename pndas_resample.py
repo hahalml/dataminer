@@ -102,10 +102,10 @@ def resample_data(data, freq="1Min"):
         # resampling price and volume will not work: price will result in a multiindex and volume in a simple index
         # so I need to create a multiindex for the volume and the concatenate price and volume
         # first lets resample the price
-        price = df.resample(freq, how={"price" : "ohlc"})
+        price = (df.resample(freq, how={"price" : "ohlc"}, label={"right"})).fillna(method={"backfill"})
 
         # second, resample volume
-        vol = df.resample(freq, how={"volume" : 'sum'})
+        vol = (df.resample(freq, how={"volume" : 'sum'}, label={"right"})).fillna(method={"backfill"})
 
         # create a multiindex for volume
         vol.columns = pd.MultiIndex.from_tuples([('volume', 'sum')])
@@ -117,4 +117,4 @@ def resample_data(data, freq="1Min"):
         json_result = result.to_json()
         print(json_result)
 if __name__ == "__main__":
-    resample_data(select_result, "M")
+    resample_data(select_result, "5Min")

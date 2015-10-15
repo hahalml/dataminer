@@ -29,13 +29,13 @@ def connect_handler(data):
     # channel = pusher.subscribe("trade.3")
     # bitstamp channel
     channel = pusher.subscribe("live_trades")
-    #channel1 = pusher.subscribe("order_book")
+    channel1 = pusher.subscribe("order_book")
 
     # cryptsy event
     # channel.bind('my_event', channel_callback)
     # bitstamp event
     channel.bind('trade', channel_callback)
-    #channel1.bind('data', channel_callback)
+    channel1.bind('data', channel_callback)
 
 if __name__ == '__main__':
     # cryptsy appkey

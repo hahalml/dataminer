@@ -41,7 +41,7 @@ class Config(Resource):
                         "supports_search": True,
                         "supports_group_request": False,
                         "supported_resolutions": ["1", "5", "15", "30", "60", "1D", "1W", "1M"],
-                        "supports_marks": False}
+                        "supports_marks": True}
         response_json = (json.dumps(response_obj, ensure_ascii=False))
         response = Flask.response_class(response=response_json)
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -91,20 +91,20 @@ class Symbols(Resource):
         # get parameters
         params = parser.parse_args()
         response_obj = {
-                        "symbol": ["BTCUSD"],
-                        "description": ["Bitcoin USD Bitstamp"],
+                        "symbol": "BTCUSD",
+                        "description": "Bitcoin USD Bitstamp",
                         "exchange-listed": "Bitstamp",
                         "exchange-traded": "Bitstamp",
                         "minmov": 1,
                         "minmov2": 0,
-                        "pricescale": [1],
+                        "pricescale": 2,
                         "has-dwm": True,
                         "has-intraday": True,
-                        "has-no-volume": [False],
-                        "type": ["stock"],
-                        "ticker": ["BTCUSD"],
+                        "has-no-volume": False,
+                        "type": "stock",
+                        "ticker": "BTCUSD",
                         "timezone": "America/New_York",
-                        "session-regular": "0900-1600"}
+                        "session-regular": "24x7"}
         response_json = (json.dumps(response_obj, ensure_ascii=False))
         response = Flask.response_class(response=response_json)
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -169,8 +169,12 @@ class History(Resource):
         params = parser.parse_args()
         response_obj = {
                         "s": "ok",
-                        "t": [1386493512, 1386493572, 1386493632, 1386493692],
-                        "c": [42.1, 43.4, 44.3, 42.8]
+                        "t": [1386493512, 1386493532, 1386493567, 1386493639],
+                        "c": [42.1, 43.4, 44.3, 42.8],
+                        "o": [41.0, 42.9, 43.7, 44.5],
+                        "h": [43.0, 44.1, 44.8, 44.5],
+                        "l": [40.4, 42.1, 42.8, 42.3],
+                        "v": [12000, 18500, 24000, 45000]
                         }
         response_json = (json.dumps(response_obj, ensure_ascii=False))
         response = Flask.response_class(response=response_json)

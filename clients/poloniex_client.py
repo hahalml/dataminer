@@ -11,7 +11,7 @@ class PoloniexComponent(ApplicationSession):
     realm_name = "realm1"
     client_config = configparser.ConfigParser()
     try:
-        client_config.read("config/poloniex_client.ini")
+        client_config.read("config/poloniex_client.conf")
     except:
         print("##### ERROR: Config format is incorect! #####")
 

@@ -1,29 +1,22 @@
-# Dataminer
+Dependencies:
+autobahn (0.10.9)
+mysql-connector-python (2.0.4)
+prettytable (0.7.2)
+pusherclient (0.3.0)
+websocket-client (0.32.0)
 
-## General random stuff
- * the miner has to create a new table for each market
- * each market has a list of symbols that it's/was trading at a certain time
- * a symbol can be terminated but it's history will not be lost
- * the database must have a way to archive information
- * the miner must never stop, and it has to reconnect if internet fails
- 
-## Desired features
-1. each api will be started in it's own thread
-2. each api will require the folowing:
-..* a config, a name, description
+General
+This program uses api clients to connect and get ticker data from different bitcoin exchanges.
+Data is stored in a mysql database and it is consumed by the tradingview financial charting library via http requests.
 
-## General structure
+Data is collected at the smallest resolution possible. The bitstamp_client is using a pusher client,
+poloniex_client a autobahn asyncio implementation.
 
-Assets are: Bitcoin, US dollar, Apple stock, etc. Each asset has a parity: Bitcoin vs USD, Apple vs USD, Ethereum vs Bitcoin
-Markets are: Bitstamp, Poloniex, Nasdaq
-A symbol has this name format: MARKET:ASSET. EX: BITSTAMP:BITCOIN or POLONIEX:ETHEREUM
+Some resampling using pandas is done prior to serving the data to the tradingview library.
 
-## Database tables
+Most configuration are hard coded at the moment.
 
-1. Assets: id, short_name, long_name, parity, description
-   Ex: 1, BTC, Bitcoin, USD, Bitcoin is a cryptocurency with value expressed in USD
-   
-2. sdfsdfsdfsdfsdf
+Anyone may use any piece of my code for any purpose.
 
 
 

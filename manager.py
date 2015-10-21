@@ -4,7 +4,7 @@ from mysql.connector import errorcode
 from prettytable import PrettyTable
 
 class Manager:
-    def __init__(self, host="localhost", database="dataminer", user="root", password="7SwwJ3y8"):
+    def __init__(self, host="localhost", database="dataminer", user="dataminer", password="asd"):
         self.database = database
         try:
             self.connection = mysql.connector.connect (host = host,
@@ -76,6 +76,9 @@ class Manager:
         # commit data to database
         self.connection.commit()
 
+    def insert_bitstamp_ticker(self, data):
+        print("done")
+
     def delete_data(self, table, by_value, by_column="id"):
         try:
             self.cursor.execute("DELETE FROM {} WHERE {}=%s".format(table, by_column), (by_value,))
@@ -105,12 +108,6 @@ class Manager:
 
 if __name__ == "__main__":
     manager = Manager()
-    test_table = "test_table"
-    test_data = [("val1_col1", "val1_col2"),
-                 ["val2_col1", "val2_col2"],
-                 ("val3_col1", "val3_col2")]
-    columns = ("name", "description")
-    values = ("updated_name", "updated_value", "val3_col1")
     manager.get_tables()
     #manager.add_data(table="test_table", data=test_data)
     #manager.delete_data(table=test_table, by_value="updated_name", by_column="name")

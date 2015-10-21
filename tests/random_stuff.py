@@ -34,8 +34,8 @@ data = [
 
 try:
     conn = mysql.connector.connect (host = "localhost",
-                               user = "root",
-                               passwd = "7SwwJ3y8",
+                               user = "dataminer",
+                               passwd = "asd",
                                db = "dataminer")
     curs = conn.cursor()
     print("Connected")

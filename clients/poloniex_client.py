@@ -1,13 +1,32 @@
 from autobahn.asyncio.wamp import ApplicationSession
 from asyncio import coroutine
 from autobahn.asyncio.wamp import ApplicationRunner
-from datetime import datetime
+# from datetime import datetime
+import configparser
+
 
 class PoloniexComponent(ApplicationSession):
-    url="wss://api.poloniex.com:443"
-    feed="ticker"
-    realm_name="realm1"
+    url = "wss://api.poloniex.com:443"
+    feed = "ticker"
+    realm_name = "realm1"
+    client_config = configparser.ConfigParser()
+    try:
+        client_config.read("config/poloniex_client.ini")
+    except:
+        print("#####ERRORConfig format is incorect")
 
+    def config_mapper(self, section):
+        dict = {}
+        options = self.client_config.options(section)
+        for option in options:
+            try:
+                dict[option] = self.client_config.get(section, option)
+                if dict[option] == -1:
+                    print("skip: %s" % option)
+            except:
+                print("exception on %s!" % option)
+                dict[option] = None
+        return dict
 
     def onConnect(self):
         self.join(self.config.realm)
@@ -29,8 +48,13 @@ class PoloniexComponent(ApplicationSession):
 
 
     def start(self):
-        runner = ApplicationRunner(self.url, self.realm_name)
-        runner.run(PoloniexComponent)
+        # print(self.client_config.sections(), self.client_config.options("market"), self.client_config.get("market", "name",vars=list()))
+        market_name = self.config_mapper("market")["name"]
+        symbols = self.config_mapper("symbols")
+
+        print(market_name, symbols)
+        #runner = ApplicationRunner(self.url, self.realm_name)
+        #runner.run(PoloniexComponent)
 
 def event_handler(event):
     # currencyPair, last, lowestAsk, highestBid, percentChange, baseVolume, quoteVolume, isFrozen, 24hrHigh, 24hrLow

@@ -1,9 +1,23 @@
-Dependencies:
-autobahn (0.10.9)
-mysql-connector-python (2.0.4)
-prettytable (0.7.2)
-pusherclient (0.3.0)
-websocket-client (0.32.0)
+##Dependencies:
+1. autobahn (0.10.9)
+* pip install autobahn[asyncio]
+
+2. mysql-connector-python (2.0.4)
+* pip install mysql-connector-python --allow-external mysql-connector-python
+
+3. prettytable (0.7.2)
+* pip install prettytable
+
+4. pusherclient (0.3.0)
+* git clone https://github.com/razvanmateid/PythonPusherClient.git
+* cd PythonPusherClient
+* python setup.py install
+
+5. Flask
+* pip install Flask
+
+6. Flask-restful
+* pip install flask-restful
 
 General
 This program uses api clients to connect and get ticker data from different bitcoin exchanges.
@@ -16,7 +30,7 @@ Some resampling using pandas is done prior to serving the data to the tradingvie
 
 Most configuration are hard coded at the moment.
 
-Anyone may use any piece of my code for any purpose.
+Licence: Anyone may use any of my code for any purpose.
 
 
 

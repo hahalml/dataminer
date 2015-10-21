@@ -13,7 +13,7 @@ class PoloniexComponent(ApplicationSession):
     try:
         client_config.read("config/poloniex_client.ini")
     except:
-        print("#####ERRORConfig format is incorect")
+        print("##### ERROR: Config format is incorect! #####")
 
     def config_mapper(self, section):
         dict = {}

@@ -4,8 +4,8 @@ To see a demo of what I'm trying to achieve visit my website:
 http://digitaleconomy.xyz/charting_library-1/index.html
 
 This represents my hobby project and my first python programming project. My objective is to eventualy build a backtesting
-engine for machine learning algorithms implemented for cryptocurencies trading (and hopefully developing some
-trading strategy that can make money or at least not lose.)
+engine for machine learning algorithms implemented for cryptocurencies trading. (and hopefully developing some
+trading strategy that can make money or at least not lose)
 
 ## General
 * This program uses api clients to connect and get ticker data from different bitcoin and cryptocurencies exchanges.

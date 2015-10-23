@@ -20,23 +20,31 @@ trading strategy that can make money or at least not lose.)
 
 ## Dependencies:
 1. autobahn (0.10.9)
+
 'pip install autobahn[asyncio]'
 
 2. mysql-connector-python (2.0.4)
+
 'pip install mysql-connector-python --allow-external mysql-connector-python'
 
 3. prettytable (0.7.2)
+
 'pip install prettytable'
 
 4. pusherclient (0.3.0)
+
 'git clone https://github.com/razvanmateid/PythonPusherClient.git'
+
 'cd PythonPusherClient'
+
 'python setup.py install'
 
 5. Flask
+
 'pip install Flask'
 
 6. Flask-restful
+
 'pip install flask-restful'
 
 ## Licence

@@ -49,9 +49,6 @@ python setup.py install
 
 `pip install flask-restful`
 
-## Licence
-Anyone may use any piece of my code for any purpose.
-
 ## Current state
 * I have implemented most of the api-clients (clients folder)
 * data resampling with pandas is working (pandas_resample.py)
@@ -65,3 +62,6 @@ They have tough Terms&Conditions :)
 ## How it(will) works
 1. api_clients-->manager-->database
 2. database-->backend<-->tradingview_library
+
+## Licence
+Anyone may use any piece of my code for any purpose.
